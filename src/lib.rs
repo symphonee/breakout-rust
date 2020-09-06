@@ -12,6 +12,9 @@ impl ggez::event::EventHandler for State {
 
         draw_text(ctx, "Hej Björn!", 200.0, 200.0)?;
         draw_text(ctx, "Let's do this!", 200.0, 250.0)?;
+        draw_text(ctx, "-------------------", 200.0, 300.0)?;
+        draw_text(ctx, "Hell yes, let's go! :D", 200.0, 350.0)?;
+        draw_text(ctx, "This is so exciting!!", 200.0, 400.0)?;
         graphics::present(ctx)
     }
 }
