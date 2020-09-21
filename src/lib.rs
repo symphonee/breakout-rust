@@ -1,40 +1,41 @@
+// lib.rs is like the entry point of the game.
+// Data is created and distributed here
+// Handlers are ticked here
+// The game is rendered here
+// And input is detected here
+// (Might be worth to split this up)
+
 use ggez::event::{KeyCode, KeyMods};
 use ggez::*;
 
+mod ball_system;
+mod game_data;
 pub mod input;
+mod key_codes;
+mod message_queue;
 use input::*;
 
-pub struct State {
-    dt: std::time::Duration,
-    pub ball_position: nalgebra::Point2<f32>,
-    pub ball_velocity: nalgebra::Vector2<f32>,
-    pub player_positon: nalgebra:: Point2<f32>,
-    pub input_state: InputState,
+pub fn run() {
+    let state = &mut game_data::State::new(
+        nalgebra::Point2::new(400.0, 0.0),
+        nalgebra::Vector2::new(0.0, 0.0),
+        nalgebra::Point2::new(200.0, 200.0),
+    );
+    let c = conf::Conf::new();
+    let (ref mut ctx, ref mut event_loop) = ContextBuilder::new("breakout", "bjandra")
+        .conf(c)
+        .build()
+        .unwrap();
+    event::run(ctx, event_loop, state).unwrap();
 }
 
-impl State {
-    pub fn new(
-        ball_position: nalgebra::Point2<f32>,
-        ball_velocity: nalgebra::Vector2<f32>,
-        player_positon: nalgebra::Point2<f32>,
-    ) -> State {
-        State {
-            dt: std::time::Duration::new(0, 0),
-            ball_position,
-            ball_velocity,
-            player_positon,
-            input_state: InputState::default(),
-        }
-    }
-}
-
-impl ggez::event::EventHandler for State {
+impl ggez::event::EventHandler for game_data::State {
     fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
         self.dt = timer::delta(ctx);
 
         let mut delta_move = nalgebra::Vector2::<f32>::zeros();
-        
-        if self.input_state.is_key_pressed(Key::A) || self.input_state.is_key_pressed(Key::Left){
+
+        if self.input_state.is_key_pressed(Key::A) || self.input_state.is_key_pressed(Key::Left) {
             delta_move.x += -1.0;
         }
 
@@ -44,22 +45,16 @@ impl ggez::event::EventHandler for State {
 
         let speed = 100.0;
         self.player_positon += delta_move * self.dt.as_secs_f32() * speed;
-        
-        self.ball_position = nalgebra::Point2::new(
-            self.ball_position.x + self.ball_velocity.x * self.dt.as_secs_f32(),
-            self.ball_position.y + self.ball_velocity.y * self.dt.as_secs_f32(),
-        );
+
+        message_queue::tick(self);
+        ball_system::tick(self);
         Ok(())
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
         graphics::clear(ctx, graphics::BLACK);
 
-        draw_text(ctx, "Hej Björn!", 200.0, 200.0)?;
-        draw_text(ctx, "Let's do this!", 200.0, 250.0)?;
-        draw_text(ctx, "-------------------", 200.0, 300.0)?;
-        draw_text(ctx, "Hell yes, let's go! :D", 200.0, 350.0)?;
-        draw_text(ctx, "This is so exciting!!", 200.0, 400.0)?;
+        draw_text(ctx, "Bjandra Breakout", 0.0, 0.0)?;
         draw_ball(ctx, &self.ball_position)?;
         draw_player(ctx, &self.player_positon)?;
         graphics::present(ctx)
@@ -75,6 +70,15 @@ impl ggez::event::EventHandler for State {
         if !repeat {
             self.input_state.set_key_pressed(keycode, true);
         }
+        match keycode {
+            key_codes::START_GAME_KEYCODE => {
+                message_queue::add_change_ball_velocity_message(
+                    &mut self.queue,
+                    nalgebra::Vector2::new(0.0, 100.0),
+                );
+            }
+            _ => (),
+        }
     }
 
     fn key_up_event(&mut self, _ctx: &mut Context, keycode: KeyCode, _keymods: KeyMods) {
@@ -86,7 +90,7 @@ fn draw_text(ctx: &mut Context, message: &str, x: f32, y: f32) -> GameResult<()>
     let font = graphics::Font::default();
     let mut text = graphics::Text::new(message);
     text.set_font(font, graphics::Scale::uniform(40.0));
-    text.set_bounds(nalgebra::Point2::new(400.0, 100.0), graphics::Align::Center);
+    text.set_bounds(nalgebra::Point2::new(800.0, 100.0), graphics::Align::Center);
     graphics::draw(
         ctx,
         &text,
