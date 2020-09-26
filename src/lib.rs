@@ -54,9 +54,17 @@ impl ggez::event::EventHandler for game_data::State {
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
         graphics::clear(ctx, graphics::BLACK);
 
-        draw_text(ctx, "Bjandra Breakout", 0.0, 0.0)?;
+        // Draw text first
+        draw_text(ctx, "Bjandra Breakout", 0.0, 100.0)?;
+
+        // Then reset
+        graphics::set_transform(ctx, graphics::DrawParam::default().to_matrix());
+        graphics::apply_transformations(ctx)?;
+
+        // Then draw other drawables
         draw_ball(ctx, &self.ball_position)?;
         draw_player(ctx, &self.player_positon)?;
+
         graphics::present(ctx)
     }
 
