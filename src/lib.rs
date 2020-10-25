@@ -16,7 +16,7 @@ mod message_queue;
 use input::*;
 
 pub fn run() {
-    let state = &mut game_data::State::new(
+    let state = &mut game_data::GameState::new(
         nalgebra::Point2::new(400.0, 0.0),
         nalgebra::Vector2::new(0.0, 0.0),
         nalgebra::Point2::new(200.0, 200.0),
@@ -29,7 +29,7 @@ pub fn run() {
     event::run(ctx, event_loop, state).unwrap();
 }
 
-impl ggez::event::EventHandler for game_data::State {
+impl ggez::event::EventHandler for game_data::GameState {
     fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
         if self.active {
             self.dt = timer::delta(ctx);

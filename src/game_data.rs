@@ -3,7 +3,7 @@
 use crate::input::InputState;
 use ggez::*;
 
-pub struct State {
+pub struct GameState {
     pub active: bool,
     pub queue: Vec<GameMessage>,
     pub dt: std::time::Duration,
@@ -17,13 +17,13 @@ pub struct State {
     stat_player_positon: nalgebra::Point2<f32>,
 }
 
-impl State {
+impl GameState {
     pub fn new(
         ball_position: nalgebra::Point2<f32>,
         ball_velocity: nalgebra::Vector2<f32>,
         player_positon: nalgebra::Point2<f32>,
-    ) -> State {
-        State {
+    ) -> GameState {
+        GameState {
             active: false,
             queue: Vec::new(),
             dt: std::time::Duration::new(0, 0),

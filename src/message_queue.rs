@@ -4,7 +4,7 @@
 
 use crate::{
     ball_system,
-    game_data::{GameMessage, State},
+    game_data::{GameMessage, GameState},
 };
 use ggez::nalgebra;
 
@@ -15,7 +15,7 @@ pub fn add_change_ball_velocity_message(
     queue.push(GameMessage::ChangeBallVelocity(new_velocity));
 }
 
-pub fn tick(state: &mut State) {
+pub fn tick(state: &mut GameState) {
     let mut message_index = 0;
     loop {
         if message_index >= state.queue.len() {
