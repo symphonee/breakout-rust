@@ -31,23 +31,29 @@ pub fn run() {
 
 impl ggez::event::EventHandler for game_data::State {
     fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
-        self.dt = timer::delta(ctx);
+        if self.active {
+            self.dt = timer::delta(ctx);
 
-        let mut delta_move = nalgebra::Vector2::<f32>::zeros();
+            let mut delta_move = nalgebra::Vector2::<f32>::zeros();
 
-        if self.input_state.is_key_pressed(Key::A) || self.input_state.is_key_pressed(Key::Left) {
-            delta_move.x += -1.0;
+            if self.input_state.is_key_pressed(Key::A) || self.input_state.is_key_pressed(Key::Left)
+            {
+                delta_move.x += -1.0;
+            }
+
+            if self.input_state.is_key_pressed(Key::D)
+                || self.input_state.is_key_pressed(Key::Right)
+            {
+                delta_move.x += 1.0
+            }
+
+            let speed = 100.0;
+            self.player_positon += delta_move * self.dt.as_secs_f32() * speed;
+
+            let mut game_messages = ball_system::tick(self);
+            self.queue.append(&mut game_messages);
         }
-
-        if self.input_state.is_key_pressed(Key::D) || self.input_state.is_key_pressed(Key::Right) {
-            delta_move.x += 1.0
-        }
-
-        let speed = 100.0;
-        self.player_positon += delta_move * self.dt.as_secs_f32() * speed;
-
         message_queue::tick(self);
-        ball_system::tick(self);
         Ok(())
     }
 
@@ -80,10 +86,7 @@ impl ggez::event::EventHandler for game_data::State {
         }
         match keycode {
             key_codes::START_GAME_KEYCODE => {
-                message_queue::add_change_ball_velocity_message(
-                    &mut self.queue,
-                    nalgebra::Vector2::new(0.0, 100.0),
-                );
+                self.queue.push(game_data::GameMessage::StartGame);
             }
             _ => (),
         }
