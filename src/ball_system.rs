@@ -19,5 +19,21 @@ pub fn tick(game_state: &mut GameState) -> Vec<GameMessage> {
     if game_state.ball_position.y > 600.0 {
         game_messages.push(GameMessage::EndGame);
     }
+    if game_state.ball_position.y < 20.0 {
+        // Hit ceiling
+        game_messages.push(GameMessage::ChangeBallVelocity(nalgebra::Vector2::new(
+            game_state.ball_velocity.x,
+            -game_state.ball_velocity.y,
+        )));
+    }
+    if game_state.ball_position.x < 20.0
+        || game_state.ball_position.x > game_state.window_width - 20.0
+    {
+        // Hit wall
+        game_messages.push(GameMessage::ChangeBallVelocity(nalgebra::Vector2::new(
+            -game_state.ball_velocity.x,
+            game_state.ball_velocity.y,
+        )));
+    }
     return game_messages;
 }

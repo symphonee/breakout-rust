@@ -13,6 +13,9 @@ pub struct GameState {
     pub input_state: InputState,
     pub walls: Vec<Wall>,
 
+    pub window_width: f32,
+    pub window_height: f32,
+
     start_ball_position: nalgebra::Point2<f32>,
     start_ball_velocity: nalgebra::Vector2<f32>,
     start_player_positon: nalgebra::Point2<f32>,
@@ -55,6 +58,8 @@ impl GameState {
             start_ball_velocity: ball_velocity,
             start_player_positon: player_positon,
             walls,
+            window_width,
+            window_height,
         }
     }
 

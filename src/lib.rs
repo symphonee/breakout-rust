@@ -17,7 +17,7 @@ use input::*;
 
 pub fn run() {
     let state = &mut game_data::GameState::new(
-        nalgebra::Point2::new(400.0, 10.0),
+        nalgebra::Point2::new(400.0, 100.0),
         nalgebra::Vector2::new(0.0, 0.0),
         nalgebra::Point2::new(200.0, 200.0),
         800.0,

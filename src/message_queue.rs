@@ -30,7 +30,7 @@ pub fn tick(state: &mut GameState) {
                 state.active = true;
                 add_change_ball_velocity_message(
                     &mut state.queue,
-                    nalgebra::Vector2::new(0.0, 100.0),
+                    nalgebra::Vector2::new(100.0, -50.0),
                 );
             }
             GameMessage::EndGame => {
