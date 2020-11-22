@@ -17,9 +17,11 @@ use input::*;
 
 pub fn run() {
     let state = &mut game_data::GameState::new(
-        nalgebra::Point2::new(400.0, 0.0),
+        nalgebra::Point2::new(400.0, 10.0),
         nalgebra::Vector2::new(0.0, 0.0),
         nalgebra::Point2::new(200.0, 200.0),
+        800.0,
+        600.0,
     );
     let c = conf::Conf::new();
     let (ref mut ctx, ref mut event_loop) = ContextBuilder::new("breakout", "bjandra")
@@ -70,6 +72,7 @@ impl ggez::event::EventHandler for game_data::GameState {
         // Then draw other drawables
         draw_ball(ctx, &self.ball_position)?;
         draw_player(ctx, &self.player_positon)?;
+        draw_walls(ctx, &self.walls)?;
 
         graphics::present(ctx)
     }
@@ -137,5 +140,19 @@ fn draw_player(ctx: &mut Context, player_positon: &nalgebra::Point2<f32>) -> Gam
     )
     .unwrap();
     graphics::draw(ctx, &circle, graphics::DrawParam::default())?;
+    Ok(())
+}
+
+fn draw_walls(ctx: &mut Context, walls: &Vec<game_data::Wall>) -> GameResult<()> {
+    for wall in walls.iter() {
+        let image = graphics::Mesh::new_rectangle(
+            ctx,
+            graphics::DrawMode::fill(),
+            graphics::Rect::new(wall.position.x, wall.position.y, wall.width, wall.height),
+            graphics::Color::new(0.5, 0.5, 0.5, 1.0),
+        )
+        .unwrap();
+        graphics::draw(ctx, &image, graphics::DrawParam::default())?;
+    }
     Ok(())
 }

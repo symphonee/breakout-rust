@@ -11,10 +11,11 @@ pub struct GameState {
     pub ball_velocity: nalgebra::Vector2<f32>,
     pub player_positon: nalgebra::Point2<f32>,
     pub input_state: InputState,
+    pub walls: Vec<Wall>,
 
     start_ball_position: nalgebra::Point2<f32>,
     start_ball_velocity: nalgebra::Vector2<f32>,
-    stat_player_positon: nalgebra::Point2<f32>,
+    start_player_positon: nalgebra::Point2<f32>,
 }
 
 impl GameState {
@@ -22,7 +23,26 @@ impl GameState {
         ball_position: nalgebra::Point2<f32>,
         ball_velocity: nalgebra::Vector2<f32>,
         player_positon: nalgebra::Point2<f32>,
+        window_width: f32,
+        window_height: f32,
     ) -> GameState {
+        let walls = vec![
+            Wall {
+                position: nalgebra::Point2::new(0.0, 0.0),
+                width: window_width,
+                height: 10.0,
+            },
+            Wall {
+                position: nalgebra::Point2::new(0.0, 0.0),
+                width: 10.0,
+                height: window_height,
+            },
+            Wall {
+                position: nalgebra::Point2::new(window_width - 10.0, 0.0),
+                width: 10.0,
+                height: window_height,
+            },
+        ];
         GameState {
             active: false,
             queue: Vec::new(),
@@ -33,7 +53,8 @@ impl GameState {
             input_state: InputState::default(),
             start_ball_position: ball_position,
             start_ball_velocity: ball_velocity,
-            stat_player_positon: player_positon,
+            start_player_positon: player_positon,
+            walls,
         }
     }
 
@@ -43,7 +64,7 @@ impl GameState {
         self.dt = std::time::Duration::new(0, 0);
         self.ball_position = self.start_ball_position;
         self.ball_velocity = self.start_ball_velocity;
-        self.player_positon = self.stat_player_positon;
+        self.player_positon = self.start_player_positon;
     }
 }
 
@@ -52,4 +73,10 @@ pub enum GameMessage {
     ChangeBallVelocity(nalgebra::Vector2<f32>),
     StartGame,
     EndGame,
+}
+
+pub struct Wall {
+    pub position: nalgebra::Point2<f32>,
+    pub width: f32,
+    pub height: f32,
 }
