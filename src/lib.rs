@@ -18,8 +18,10 @@ use input::*;
 pub fn run() {
     let state = &mut game_data::GameState::new(
         nalgebra::Point2::new(400.0, 100.0),
-        nalgebra::Vector2::new(0.0, 0.0),
+        nalgebra::Vector2::new(-100.0, -50.0),
+        10.0,
         nalgebra::Point2::new(200.0, 200.0),
+        30.0,
         800.0,
         600.0,
     );
@@ -70,8 +72,8 @@ impl ggez::event::EventHandler for game_data::GameState {
         graphics::apply_transformations(ctx)?;
 
         // Then draw other drawables
-        draw_ball(ctx, &self.ball_position)?;
-        draw_player(ctx, &self.player_positon)?;
+        draw_ball(ctx, &self.ball_position, self.ball_radius)?;
+        draw_player(ctx, &self.player_positon, self.player_radius)?;
         draw_walls(ctx, &self.walls)?;
 
         graphics::present(ctx)
@@ -115,12 +117,16 @@ fn draw_text(ctx: &mut Context, message: &str, x: f32, y: f32) -> GameResult<()>
     Ok(())
 }
 
-fn draw_ball(ctx: &mut Context, ball_position: &nalgebra::Point2<f32>) -> GameResult<()> {
+fn draw_ball(
+    ctx: &mut Context,
+    ball_position: &nalgebra::Point2<f32>,
+    ball_radius: f32,
+) -> GameResult<()> {
     let circle = graphics::Mesh::new_circle(
         ctx,
         graphics::DrawMode::fill(),
         *ball_position,
-        10.0,
+        ball_radius,
         2.0,
         graphics::WHITE,
     )
@@ -129,12 +135,16 @@ fn draw_ball(ctx: &mut Context, ball_position: &nalgebra::Point2<f32>) -> GameRe
     Ok(())
 }
 
-fn draw_player(ctx: &mut Context, player_positon: &nalgebra::Point2<f32>) -> GameResult<()> {
+fn draw_player(
+    ctx: &mut Context,
+    player_positon: &nalgebra::Point2<f32>,
+    player_radius: f32,
+) -> GameResult<()> {
     let circle = graphics::Mesh::new_circle(
         ctx,
         graphics::DrawMode::fill(),
         *player_positon,
-        30.0,
+        player_radius,
         2.0,
         graphics::WHITE,
     )

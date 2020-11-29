@@ -6,14 +6,6 @@ use crate::{
     ball_system,
     game_data::{GameMessage, GameState},
 };
-use ggez::nalgebra;
-
-pub fn add_change_ball_velocity_message(
-    queue: &mut Vec<GameMessage>,
-    new_velocity: nalgebra::Vector2<f32>,
-) {
-    queue.push(GameMessage::ChangeBallVelocity(new_velocity));
-}
 
 pub fn tick(state: &mut GameState) {
     let mut message_index = 0;
@@ -26,12 +18,11 @@ pub fn tick(state: &mut GameState) {
             GameMessage::ChangeBallVelocity(velocity) => {
                 ball_system::handle_ball_velocity_change(state, velocity);
             }
+            GameMessage::MoveBallToPosition(position) => {
+                ball_system::handle_ball_move(state, position);
+            }
             GameMessage::StartGame => {
                 state.active = true;
-                add_change_ball_velocity_message(
-                    &mut state.queue,
-                    nalgebra::Vector2::new(100.0, -50.0),
-                );
             }
             GameMessage::EndGame => {
                 state.reset();
