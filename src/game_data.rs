@@ -17,6 +17,10 @@ pub struct GameState {
     pub input_state: InputState,
     pub walls: Vec<Wall>,
 
+    pub blocks: Vec<bool>, // is block active
+    pub block_width: u32,
+    pub block_height: u32,
+
     pub window_width: f32,
     pub window_height: f32,
 
@@ -32,6 +36,8 @@ impl GameState {
         ball_radius: f32,
         player_positon: nalgebra::Point2<f32>,
         player_radius: f32,
+        block_width: u32,
+        block_height: u32,
         window_width: f32,
         window_height: f32,
     ) -> GameState {
@@ -52,6 +58,10 @@ impl GameState {
                 height: window_height,
             },
         ];
+        let mut blocks = Vec::default();
+        for _ in 0..(block_width * block_height) {
+            blocks.push(true);
+        }
         GameState {
             active: false,
             queue: Vec::new(),
@@ -62,12 +72,15 @@ impl GameState {
             player_positon,
             player_radius,
             input_state: InputState::default(),
+            walls,
+            blocks,
+            block_width,
+            block_height,
+            window_width,
+            window_height,
             start_ball_position: ball_position,
             start_ball_velocity: ball_velocity,
             start_player_positon: player_positon,
-            walls,
-            window_width,
-            window_height,
         }
     }
 

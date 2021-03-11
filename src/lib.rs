@@ -20,8 +20,10 @@ pub fn run() {
         nalgebra::Point2::new(400.0, 100.0),
         nalgebra::Vector2::new(-100.0, -50.0),
         10.0,
-        nalgebra::Point2::new(200.0, 200.0),
-        30.0,
+        nalgebra::Point2::new(400.0, 600.0),
+        50.0,
+        10,
+        5,
         800.0,
         600.0,
     );
@@ -62,7 +64,7 @@ impl ggez::event::EventHandler for game_data::GameState {
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
-        graphics::clear(ctx, graphics::BLACK);
+        graphics::clear(ctx, graphics::Color::new(0.7, 0.7, 0.7, 1.0));
 
         // Draw text first
         draw_text(ctx, "Bjandra Breakout", 0.0, 100.0)?;
@@ -75,6 +77,7 @@ impl ggez::event::EventHandler for game_data::GameState {
         draw_ball(ctx, &self.ball_position, self.ball_radius)?;
         draw_player(ctx, &self.player_positon, self.player_radius)?;
         draw_walls(ctx, &self.walls)?;
+        draw_blocks(ctx, self.block_width, self.block_height, &self.blocks, 30.0, self.window_width, self.window_height)?;
 
         graphics::present(ctx)
     }
@@ -163,6 +166,53 @@ fn draw_walls(ctx: &mut Context, walls: &Vec<game_data::Wall>) -> GameResult<()>
         )
         .unwrap();
         graphics::draw(ctx, &image, graphics::DrawParam::default())?;
+    }
+    Ok(())
+}
+
+fn draw_blocks(
+    ctx: &mut Context,
+    blocks_width: u32,
+    blocks_height: u32,
+    blocks: &Vec<bool>,
+    block_diameter: f32,
+    window_width: f32,
+    window_height: f32,
+) -> GameResult<()> {
+    for i_h in 0..blocks_height {
+        for i_w in 0..blocks_width {
+            if blocks[(blocks_width * i_h + i_w) as usize] {
+                let image = graphics::Mesh::new_rectangle(
+                    ctx,
+                    graphics::DrawMode::fill(),
+                    graphics::Rect::new(
+                        (i_w as f32 - blocks_width as f32 * 0.5) * block_diameter + window_width * 0.5,
+                        (i_h as f32 - blocks_height as f32 * 0.5) * block_diameter + window_height * 0.5,
+                        block_diameter,
+                        block_diameter,
+                    ),
+                    graphics::Color::new(0.0, 0.0, 0.0, 1.0),
+                )
+                .unwrap();
+                graphics::draw(ctx, &image, graphics::DrawParam::default())?;
+
+                let smaller_block_diameter = block_diameter * 0.8;
+                let padding = block_diameter * 0.1;
+                let image = graphics::Mesh::new_rectangle(
+                    ctx,
+                    graphics::DrawMode::fill(),
+                    graphics::Rect::new(
+                        (i_w as f32 - blocks_width as f32 * 0.5) * block_diameter + window_width * 0.5 + padding,
+                        (i_h as f32 - blocks_height as f32 * 0.5) * block_diameter + window_height * 0.5 + padding,
+                        smaller_block_diameter,
+                        smaller_block_diameter,
+                    ),
+                    graphics::Color::new(0.0, 1.0, 0.0, 1.0),
+                )
+                .unwrap();
+                graphics::draw(ctx, &image, graphics::DrawParam::default())?;
+            }
+        }
     }
     Ok(())
 }

@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 // Define some keys that we want for input!
 // Currently only have keys for left and right movement.
-// Put A, D and Left, Right, in case we want two players! 
+// Put A, D and Left, Right, in case we want two players!
 #[derive(Clone, Copy, PartialEq, Hash, Eq)]
 pub enum Key {
     A,
@@ -14,7 +14,6 @@ pub enum Key {
 }
 
 impl Key {
-
     // Returns an iterator for easy input state initialization.
     pub fn iter() -> Iter<'static, Key> {
         static KEYS: [Key; 4] = [Key::A, Key::D, Key::Left, Key::Right];
@@ -28,7 +27,7 @@ impl Key {
             KeyCode::D => Some(Key::D),
             KeyCode::Left => Some(Key::Left),
             KeyCode::Right => Some(Key::Right),
-            _ => None
+            _ => None,
         }
     }
 }
