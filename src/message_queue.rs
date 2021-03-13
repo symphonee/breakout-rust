@@ -6,6 +6,7 @@ use crate::{
     ball_system,
     game_data::{GameMessage, GameState},
 };
+use ggez::nalgebra;
 
 pub fn tick(state: &mut GameState) {
     let mut message_index = 0;
@@ -26,6 +27,42 @@ pub fn tick(state: &mut GameState) {
             }
             GameMessage::EndGame => {
                 state.reset();
+            }
+            GameMessage::BallFlyFromRight => {
+                state.ball_position.y = state.window_height * 0.5;
+                state.ball_position.x = 100.0;
+                state
+                    .queue
+                    .push(GameMessage::ChangeBallVelocity(nalgebra::Vector2::new(
+                        200.0, 0.0,
+                    )));
+            }
+            GameMessage::BallFlyFromLeft => {
+                state.ball_position.y = state.window_height * 0.5;
+                state.ball_position.x = state.window_width - 100.0;
+                state
+                    .queue
+                    .push(GameMessage::ChangeBallVelocity(nalgebra::Vector2::new(
+                        -200.0, 0.0,
+                    )));
+            }
+            GameMessage::BallFlyFromTop => {
+                state.ball_position.y = 100.0;
+                state.ball_position.x = state.window_width * 0.5;
+                state
+                    .queue
+                    .push(GameMessage::ChangeBallVelocity(nalgebra::Vector2::new(
+                        0.0, 200.0,
+                    )));
+            }
+            GameMessage::BallFlyFromBottom => {
+                state.ball_position.y = state.window_height - 100.0;
+                state.ball_position.x = state.window_width * 0.5;
+                state
+                    .queue
+                    .push(GameMessage::ChangeBallVelocity(nalgebra::Vector2::new(
+                        0.0, -200.0,
+                    )));
             }
         }
         message_index += 1;

@@ -18,14 +18,17 @@ use input::*;
 pub fn run() {
     let state = &mut game_data::GameState::new(
         nalgebra::Point2::new(400.0, 100.0),
-        nalgebra::Vector2::new(-100.0, -50.0),
+        nalgebra::Vector2::new(100.0, 200.0),
         10.0,
         nalgebra::Point2::new(400.0, 600.0),
         50.0,
-        10,
+        3.0,
+        9,
         5,
+        30.0,
         800.0,
         600.0,
+        10.0,
     );
     let c = conf::Conf::new();
     let (ref mut ctx, ref mut event_loop) = ContextBuilder::new("breakout", "bjandra")
@@ -44,17 +47,22 @@ impl ggez::event::EventHandler for game_data::GameState {
 
             if self.input_state.is_key_pressed(Key::A) || self.input_state.is_key_pressed(Key::Left)
             {
-                delta_move.x += -1.0;
+                delta_move.x += -self.player_speed;
             }
 
             if self.input_state.is_key_pressed(Key::D)
                 || self.input_state.is_key_pressed(Key::Right)
             {
-                delta_move.x += 1.0
+                delta_move.x += self.player_speed;
             }
 
             let speed = 100.0;
             self.player_positon += delta_move * self.dt.as_secs_f32() * speed;
+            if self.player_positon.x > self.window_width - self.player_radius {
+                self.player_positon.x = self.window_width - self.player_radius;
+            } else if self.player_positon.x < self.player_radius {
+                self.player_positon.x = self.player_radius;
+            }
 
             let mut game_messages = ball_system::tick(self);
             self.queue.append(&mut game_messages);
@@ -77,7 +85,15 @@ impl ggez::event::EventHandler for game_data::GameState {
         draw_ball(ctx, &self.ball_position, self.ball_radius)?;
         draw_player(ctx, &self.player_positon, self.player_radius)?;
         draw_walls(ctx, &self.walls)?;
-        draw_blocks(ctx, self.block_width, self.block_height, &self.blocks, 30.0, self.window_width, self.window_height)?;
+        draw_blocks(
+            ctx,
+            self.block_width,
+            self.block_height,
+            &self.blocks,
+            self.block_diameter,
+            self.window_width,
+            self.window_height,
+        )?;
 
         graphics::present(ctx)
     }
@@ -95,6 +111,21 @@ impl ggez::event::EventHandler for game_data::GameState {
         match keycode {
             key_codes::START_GAME_KEYCODE => {
                 self.queue.push(game_data::GameMessage::StartGame);
+            }
+            key_codes::END_GAME_KEYCODE => {
+                self.queue.push(game_data::GameMessage::EndGame);
+            }
+            key_codes::BALL_FLY_FROM_RIGHT_KEYCODE => {
+                self.queue.push(game_data::GameMessage::BallFlyFromRight);
+            }
+            key_codes::BALL_FLY_FROM_LEFT_KEYCODE => {
+                self.queue.push(game_data::GameMessage::BallFlyFromLeft);
+            }
+            key_codes::BALL_FLY_FROM_TOP_KEYCODE => {
+                self.queue.push(game_data::GameMessage::BallFlyFromTop);
+            }
+            key_codes::BALL_FLY_FROM_BOTTOM_KEYCODE => {
+                self.queue.push(game_data::GameMessage::BallFlyFromBottom);
             }
             _ => (),
         }
@@ -186,8 +217,10 @@ fn draw_blocks(
                     ctx,
                     graphics::DrawMode::fill(),
                     graphics::Rect::new(
-                        (i_w as f32 - blocks_width as f32 * 0.5) * block_diameter + window_width * 0.5,
-                        (i_h as f32 - blocks_height as f32 * 0.5) * block_diameter + window_height * 0.5,
+                        (i_w as f32 - blocks_width as f32 * 0.5) * block_diameter
+                            + window_width * 0.5,
+                        (i_h as f32 - blocks_height as f32 * 0.5) * block_diameter
+                            + window_height * 0.5,
                         block_diameter,
                         block_diameter,
                     ),
@@ -202,8 +235,12 @@ fn draw_blocks(
                     ctx,
                     graphics::DrawMode::fill(),
                     graphics::Rect::new(
-                        (i_w as f32 - blocks_width as f32 * 0.5) * block_diameter + window_width * 0.5 + padding,
-                        (i_h as f32 - blocks_height as f32 * 0.5) * block_diameter + window_height * 0.5 + padding,
+                        (i_w as f32 - blocks_width as f32 * 0.5) * block_diameter
+                            + window_width * 0.5
+                            + padding,
+                        (i_h as f32 - blocks_height as f32 * 0.5) * block_diameter
+                            + window_height * 0.5
+                            + padding,
                         smaller_block_diameter,
                         smaller_block_diameter,
                     ),
