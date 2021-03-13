@@ -30,7 +30,8 @@ pub fn run() {
         600.0,
         10.0,
     );
-    let c = conf::Conf::new();
+    let mut c = conf::Conf::new();
+    c.window_setup = c.window_setup.title("Bjandra Breakout");
     let (ref mut ctx, ref mut event_loop) = ContextBuilder::new("breakout", "bjandra")
         .conf(c)
         .build()
